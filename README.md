@@ -31,6 +31,9 @@ This project was developed with:
 - JavaScript
 - Tailwind CSS
 - Heroicon
+- Koajs
+- prisma.io
+- app.planetscale (cloud DB)
 
 ## 💻 Project
 

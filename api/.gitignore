@@ -1,0 +1,6 @@
+node_modules
+videos_tutorials/*.mp4
+/videos_tutorials/*
+
+# Keep environment variables out of version control
+.env
