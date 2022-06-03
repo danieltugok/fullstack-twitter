@@ -34,6 +34,9 @@ This project was developed with:
 - Koajs
 - prisma.io
 - app.planetscale (cloud DB)
+- bcrypt
+- jwt
+- axios
 
 ## 💻 Project
 
