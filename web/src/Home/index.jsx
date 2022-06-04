@@ -1,10 +1,32 @@
 import { useEffect, useState } from "react";
 import { HeartIcon } from "@heroicons/react/outline";
+import { useFormik } from "formik";
+
 import axios from "axios";
 
 const MAX_TWITTER_CHAR = 250;
 
-function TweetForm() {
+function TweetForm({ loggedUser, onSuccess }) {
+  const formik = useFormik({
+    onSubmit: async (values, form) => {
+      await axios.post(
+        "http://localhost:9901/tweets",
+        { text: values.text },
+        {
+          headers: {
+            authorization: `Bearer ${loggedUser.accessToken}`,
+          },
+        }
+      );
+
+      form.setFieldValue('text', '');
+      onSuccess();
+    },
+    initialValues: {
+      text: "",
+    },
+  });
+
   const [text, setText] = useState("");
 
   function changeText(e) {
@@ -18,22 +40,31 @@ function TweetForm() {
         <h1 className="font-bold text-xl">Inicial Page</h1>
       </div>
 
-      <form action="" className="pl-12 text-lg flex flex-col">
+      <form
+        onSubmit={formik.handleSubmit}
+        className="pl-12 text-lg flex flex-col"
+      >
         <textarea
           placeholder="What's happening?"
           type="text"
           name="text"
-          value={text}
+          value={formik.values.text}
           className="bg-transparent outline-none disabled:opacity-50"
-          onChange={changeText}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          disabled={formik.isSubmitting}
         />
         <div className="flex justify-end items-center space-x-3">
           <span className="text-sm">
-            <span>{text.length}</span> /{" "}
+            <span>{formik.values.text.length}</span> /{" "}
             <span className="text-birdBlue"> {MAX_TWITTER_CHAR}</span>
           </span>
           <button
-            disabled={text.length > MAX_TWITTER_CHAR}
+            type="submit"
+            disabled={
+              formik.values.text.length > MAX_TWITTER_CHAR ||
+              formik.isSubmitting
+            }
             className="bg-birdBlue px-5 py-2 rounded-full disabled:opacity-50"
           >
             Tweet
@@ -63,14 +94,14 @@ function Tweet({ name, username, avatar, children }) {
   );
 }
 
-export const Home = ({loggedUser}) => {
+export const Home = ({ loggedUser }) => {
   const [data, setData] = useState([]);
 
   async function getData() {
     const res = await axios.get("http://localhost:9901/tweets", {
-      headers:{
-        'authorization' : `Bearer ${loggedUser.accessToken}`
-      }
+      headers: {
+        authorization: `Bearer ${loggedUser.accessToken}`,
+      },
     });
     setData(res.data);
   }
@@ -81,10 +112,10 @@ export const Home = ({loggedUser}) => {
 
   return (
     <>
-      <TweetForm />
+      <TweetForm loggedUser={loggedUser} onSuccess={getData} />
       <div>
         {data.length &&
-          data.map(tweet => (
+          data.map((tweet) => (
             <Tweet
               name={tweet.user.name}
               username={tweet.user.username}
