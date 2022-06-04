@@ -48,7 +48,7 @@ function Tweet({ name, username, avatar, children }) {
   return (
     <div className="flex space-x-3 p-4 border-b border-silver ">
       <div>
-        <img src={avatar} class="tweet_img" alt="" />
+        <img src={avatar} className="tweet_img" alt="" />
       </div>
       <div className="space-y-1">
         <span className="font-bold text-sm">{name}</span>{" "}
@@ -63,14 +63,13 @@ function Tweet({ name, username, avatar, children }) {
   );
 }
 
-export const Home = () => {
-  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbDN4dm9haWMwMDAyd2NjM2t2cjJtZHAwIiwiaWF0IjoxNjU0MzAyMDgwLCJleHAiOjE2NTQzODg0ODB9.7KU3joXYFF1CrSCbVaJCk0I9hbnZ07QWA8FybPo78tw'
+export const Home = ({loggedUser}) => {
   const [data, setData] = useState([]);
 
   async function getData() {
     const res = await axios.get("http://localhost:9901/tweets", {
       headers:{
-        'authorization' : `Bearer ${token}`
+        'authorization' : `Bearer ${loggedUser.accessToken}`
       }
     });
     setData(res.data);
@@ -90,6 +89,7 @@ export const Home = () => {
               name={tweet.user.name}
               username={tweet.user.username}
               avatar="/src/imgs/avatar.png"
+              key={tweet.id}
             >
               {tweet.text}
             </Tweet>

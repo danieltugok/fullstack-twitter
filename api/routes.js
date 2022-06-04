@@ -8,9 +8,7 @@ export const router = new Router();
 const prisma = new PrismaClient();
 
 router.get('/tweets', async ctx => {
-  const [, token] = ctx.request.headers?.authorization?.split(' ') || []
-  console.log("🚀 ~ file: routes.js ~ line 12 ~ token", token)
-  
+  const [, token] = ctx.request.headers?.authorization?.split(' ') || []  
 
   if (!token) {
     ctx.status = 401;
