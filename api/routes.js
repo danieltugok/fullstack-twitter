@@ -9,6 +9,8 @@ const prisma = new PrismaClient();
 
 router.get('/tweets', async ctx => {
   const [, token] = ctx.request.headers?.authorization?.split(' ') || []
+  console.log("🚀 ~ file: routes.js ~ line 12 ~ token", token)
+  
 
   if (!token) {
     ctx.status = 401;
@@ -17,7 +19,11 @@ router.get('/tweets', async ctx => {
 
   try {
     jwt.verify(token, process.env.JWT_SECRET);    
-    const tweets = await prisma.tweet.findMany();
+    const tweets = await prisma.tweet.findMany({
+      include: {
+        user:true
+      }
+    });
     ctx.body = tweets;  
   } catch (error) {
     ctx.status = 401;
@@ -57,6 +63,8 @@ router.delete('/tweets/:id', async ctx => {
     where: { id }
   })
 
+
+
   ctx.body = tweet;
 });
 
@@ -76,6 +84,12 @@ router.post('/signup', async ctx => {
         password: hash
       }
     })
+
+    const accessToken = jwt.sign({
+      sub: user.id,
+    }, process.env.JWT_SECRET, {expiresIn: '24h'});
+
+    user.accessToken = accessToken;
   
     ctx.body = user;
     

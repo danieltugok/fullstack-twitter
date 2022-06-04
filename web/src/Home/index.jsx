@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { HeartIcon } from "@heroicons/react/outline";
+import axios from "axios";
 
 const MAX_TWITTER_CHAR = 250;
 
 function TweetForm() {
-
   const [text, setText] = useState("");
 
   function changeText(e) {
@@ -32,10 +32,12 @@ function TweetForm() {
             <span>{text.length}</span> /{" "}
             <span className="text-birdBlue"> {MAX_TWITTER_CHAR}</span>
           </span>
-          <button 
+          <button
             disabled={text.length > MAX_TWITTER_CHAR}
             className="bg-birdBlue px-5 py-2 rounded-full disabled:opacity-50"
-          >Tweet</button>
+          >
+            Tweet
+          </button>
         </div>
       </form>
     </div>
@@ -62,24 +64,36 @@ function Tweet({ name, username, avatar, children }) {
 }
 
 export const Home = () => {
+  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbDN4dm9haWMwMDAyd2NjM2t2cjJtZHAwIiwiaWF0IjoxNjU0MzAyMDgwLCJleHAiOjE2NTQzODg0ODB9.7KU3joXYFF1CrSCbVaJCk0I9hbnZ07QWA8FybPo78tw'
+  const [data, setData] = useState([]);
+
+  async function getData() {
+    const res = await axios.get("http://localhost:9901/tweets", {
+      headers:{
+        'authorization' : `Bearer ${token}`
+      }
+    });
+    setData(res.data);
+  }
+
+  useEffect(() => {
+    getData();
+  }, []);
+
   return (
     <>
       <TweetForm />
       <div>
-        <Tweet
-          name="Elon Musk"
-          username="elonmusk"
-          avatar="/src/imgs/avatar.png"
-        >
-          Let make Twitter maximum fun!
-        </Tweet>
-        <Tweet
-          name="Daniel Kogut"
-          username="danielkogut"
-          avatar="/src/imgs/avatar.png"
-        >
-          Let make Twitter maximum awesome!
-        </Tweet>
+        {data.length &&
+          data.map(tweet => (
+            <Tweet
+              name={tweet.user.name}
+              username={tweet.user.username}
+              avatar="/src/imgs/avatar.png"
+            >
+              {tweet.text}
+            </Tweet>
+          ))}
       </div>
     </>
   );

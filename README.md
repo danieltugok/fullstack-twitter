@@ -25,8 +25,7 @@
 
 This project was developed with:
 
-- HTML5
-- CSS3
+- HTML5/CSS3
 - React
 - JavaScript
 - Tailwind CSS
